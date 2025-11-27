@@ -391,7 +391,7 @@
         
         setTimeout(async () => {
             await typeText('line1', "It's your favorite color!");
-            await new Promise(resolve => setTimeout(resolve, 300));
+            await new Promise(resolve => setTimeout(resolve, 1000));
             await typeText('line2', "Now that we're done with all the boring stuff, let's have some fun.");
             await new Promise(resolve => setTimeout(resolve, 300));
             await typeText('line3', '[loading GAME HUB]');
