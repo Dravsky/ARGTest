@@ -97,6 +97,10 @@
             line-height: 1.6;
         }
         
+        .typing {
+            opacity: 0;
+        }
+        
         .prompt {
             color: #0f0;
         }
@@ -183,7 +187,6 @@
     <div class="crt">
         <div class="screen">
             <div class="terminal-content" id="conversation">
-                <!-- Content will be inserted here by JavaScript -->
             </div>
         </div>
     </div>
@@ -198,27 +201,26 @@
             } : null;
         }
         
-        function generateRandomNoise(length) {
+        function generateDeterministicNoise(seed, length) {
             const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+-=[]{}|;:,.<>?';
             let noise = '';
+            let rng = seed;
             for (let i = 0; i < length; i++) {
-                noise += chars.charAt(Math.floor(Math.random() * chars.length));
+                rng = (rng * 1103515245 + 12345) & 0x7fffffff;
+                noise += chars.charAt(rng % chars.length);
             }
             return noise;
         }
         
         function simpleHash(str) {
-            let hash = 0;
+            let hash = 5381;
             for (let i = 0; i < str.length; i++) {
-                const char = str.charCodeAt(i);
-                hash = ((hash << 5) - hash) + char;
-                hash = hash & hash;
+                hash = ((hash << 5) + hash) + str.charCodeAt(i);
             }
-            return hash;
+            return hash >>> 0;
         }
         
         function decryptLink(firstName, color, month, day, animal, animName) {
-            // Convert all to lowercase for processing
             const fName = (firstName || '').toLowerCase().trim();
             const fColor = (color || '').toLowerCase().trim();
             const fMonth = (month || '').toLowerCase().trim();
@@ -226,18 +228,16 @@
             const fAnimal = (animal || '').toLowerCase().trim();
             const fAnimName = (animName || '').toLowerCase().trim();
             
-            // Create a composite key from all parameters
             const key = fName + fColor + fMonth + fDay + fAnimal + fAnimName;
             const hash = simpleHash(key);
-            
-            // Magic number check - this hash matches the correct credentials
-            // Without revealing what they are in the code
-            if (hash === 1318678058) {
-                // Decrypt the URL using the parameters as the key
+        
+            if (hash === 2283115251) {
                 const encrypted = [104,116,116,112,115,58,47,47,100,111,99,115,46,103,111,111,103,108,101,46,99,111,109,47,100,111,99,117,109,101,110,116,47,100,47,49,69,68,73,85,67,53,109,66,122,69,51,75,110,116,85,49,82,57,82,99,114,98,113,84,120,90,50,57,103,74,115,67,117,111,109,97,73,117,83,48,70,119,77,47,101,100,105,116,63,117,115,112,61,115,104,97,114,105,110,103];
-                return encrypted.map(c => String.fromCharCode(c)).join('');
+                const url = encrypted.map(c => String.fromCharCode(c)).join('');
+                return url;
             } else {
-                return generateRandomNoise(80);
+                const noise = generateDeterministicNoise(hash, 80);
+                return noise;
             }
         }
         
@@ -245,10 +245,8 @@
             const today = new Date();
             const currentYear = today.getFullYear();
             
-            // Month is 1-indexed in the input, but 0-indexed in Date
             const birthday = new Date(currentYear, month - 1, day);
             
-            // If birthday has passed this year, calculate for next year
             if (birthday < today) {
                 birthday.setFullYear(currentYear + 1);
             }
@@ -260,8 +258,7 @@
         }
         
         function lightenColor(rgb) {
-            // Increase brightness by boosting RGB values
-            const factor = 1.5; // Brightness multiplier
+            const factor = 1.5;
             return {
                 r: Math.min(255, Math.floor(rgb.r * factor + (255 - rgb.r) * 0.3)),
                 g: Math.min(255, Math.floor(rgb.g * factor + (255 - rgb.g) * 0.3)),
@@ -312,7 +309,6 @@
             }
         }
         
-        // Get URL parameters
         const urlParams = new URLSearchParams(window.location.search);
         const firstName = urlParams.get('firstName') || 'User';
         const color = urlParams.get('color') || 'green';
@@ -321,7 +317,6 @@
         const animal = urlParams.get('animal') || 'dog';
         const animName = urlParams.get('animName') || 'Buddy';
         
-        // Calculate days until birthday
         const monthNum = {
             'january': 1, 'february': 2, 'march': 3, 'april': 4,
             'may': 5, 'june': 6, 'july': 7, 'august': 8,
@@ -330,10 +325,8 @@
         
         const daysUntil = calculateDaysUntilBirthday(monthNum, parseInt(day));
         
-        // Check credentials and generate error code
         const errorCode = decryptLink(firstName, color, month, day, animal, animName);
         
-        // Build the conversation
         const conversation = `
             <div class="line"><span class="prompt">&gt;</span> <span class="user-input">${color}</span></div>
             <div class="line output">${color} is a pretty color.</div>
@@ -353,12 +346,62 @@
             <div class="line output">${animName} the ${animal}. Sounds like it would make a great buddy. :)</div>
             <div class="line output">Thanks for answering those questions. You did a great job!</div>
             <div class="line output">As a thanks, I have a little surprise for you...</div>
-            <div class="line"><br></div>
-            <div class="line error">ERROR: Invalid login credentials</div>
-            <div class="line error">Error code: ${errorCode}</div>
+            <div class="line typing" id="line1"><span class="output"></span></div>
+            <div class="line typing" id="line2"><span class="output"></span></div>
+            <div class="line typing" id="line3"><span class="output"></span></div>
+            <div class="line typing" id="line4"><span class="output"></span></div>
+            <div class="line typing" id="errorLine1"><span class="error"></span></div>
+            <div class="line typing" id="errorLine2"><span class="error"></span></div>
         `;
         
         document.getElementById('conversation').innerHTML = conversation;
+        
+        const screen = document.querySelector('.screen');
+        screen.scrollTop = screen.scrollHeight;
+        
+        function typeText(elementId, text, isError = false, speed = 50) {
+            return new Promise((resolve) => {
+                const element = document.getElementById(elementId);
+                const span = element.querySelector(isError ? '.error' : '.output');
+                const screen = document.querySelector('.screen');
+                element.style.opacity = '1';
+                let index = 0;
+                
+                const interval = setInterval(() => {
+                    if (index < text.length) {
+                        span.textContent += text[index];
+                        screen.scrollTop = screen.scrollHeight;
+                        index++;
+                    } else {
+                        clearInterval(interval);
+                        resolve();
+                    }
+                }, speed);
+            });
+        }
+        
+        function displayInstant(elementId, text, isError = false) {
+            const element = document.getElementById(elementId);
+            const span = element.querySelector(isError ? '.error' : '.output');
+            const screen = document.querySelector('.screen');
+            element.style.opacity = '1';
+            span.textContent = text;
+            screen.scrollTop = screen.scrollHeight; 
+        }
+        
+        setTimeout(async () => {
+            await typeText('line1', "It's your favorite color!");
+            await new Promise(resolve => setTimeout(resolve, 300));
+            await typeText('line2', "Now that we're done with all the boring stuff, let's have some fun.");
+            await new Promise(resolve => setTimeout(resolve, 300));
+            await typeText('line3', '[loading GAME HUB]');
+            await new Promise(resolve => setTimeout(resolve, 300));
+            await typeText('line4', '...............', false, 100);
+            await new Promise(resolve => setTimeout(resolve, 300));
+            displayInstant('errorLine1', 'ERROR: Invalid user credentials', true);
+            displayInstant('errorLine2', `Error code: ${errorCode}`, true);
+        }, 500);
+        
         applyColor(color);
     </script>
 </body>
