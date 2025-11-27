@@ -313,7 +313,7 @@
         const firstName = urlParams.get('firstName') || 'User';
         const color = urlParams.get('color') || 'green';
         const month = urlParams.get('month') || 'January';
-        const day = urlParams.get('day') || '1';
+        const day = parseInt(urlParams.get('day')).toString() || '1';
         const animal = urlParams.get('animal') || 'dog';
         const animName = urlParams.get('animName') || 'Buddy';
         
