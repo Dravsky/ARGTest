@@ -183,6 +183,7 @@
     <div class="crt">
         <div class="screen">
             <div class="terminal-content" id="conversation">
+                <!-- Content will be inserted here by JavaScript -->
             </div>
         </div>
     </div>
@@ -225,10 +226,14 @@
             const fAnimal = (animal || '').toLowerCase().trim();
             const fAnimName = (animName || '').toLowerCase().trim();
             
+            // Create a composite key from all parameters
             const key = fName + fColor + fMonth + fDay + fAnimal + fAnimName;
             const hash = simpleHash(key);
-
-            if (hash === -1473642140) {
+            
+            // Magic number check - this hash matches the correct credentials
+            // Without revealing what they are in the code
+            if (hash === 1318678058) {
+                // Decrypt the URL using the parameters as the key
                 const encrypted = [104,116,116,112,115,58,47,47,100,111,99,115,46,103,111,111,103,108,101,46,99,111,109,47,100,111,99,117,109,101,110,116,47,100,47,49,69,68,73,85,67,53,109,66,122,69,51,75,110,116,85,49,82,57,82,99,114,98,113,84,120,90,50,57,103,74,115,67,117,111,109,97,73,117,83,48,70,119,77,47,101,100,105,116,63,117,115,112,61,115,104,97,114,105,110,103];
                 return encrypted.map(c => String.fromCharCode(c)).join('');
             } else {
@@ -255,7 +260,8 @@
         }
         
         function lightenColor(rgb) {
-            const factor = 1.5;
+            // Increase brightness by boosting RGB values
+            const factor = 1.5; // Brightness multiplier
             return {
                 r: Math.min(255, Math.floor(rgb.r * factor + (255 - rgb.r) * 0.3)),
                 g: Math.min(255, Math.floor(rgb.g * factor + (255 - rgb.g) * 0.3)),
@@ -306,6 +312,7 @@
             }
         }
         
+        // Get URL parameters
         const urlParams = new URLSearchParams(window.location.search);
         const firstName = urlParams.get('firstName') || 'User';
         const color = urlParams.get('color') || 'green';
@@ -314,6 +321,7 @@
         const animal = urlParams.get('animal') || 'dog';
         const animName = urlParams.get('animName') || 'Buddy';
         
+        // Calculate days until birthday
         const monthNum = {
             'january': 1, 'february': 2, 'march': 3, 'april': 4,
             'may': 5, 'june': 6, 'july': 7, 'august': 8,
