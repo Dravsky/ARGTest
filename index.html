@@ -76,6 +76,7 @@
             transform-style: preserve-3d;
             filter: blur(0.3px);
             border-radius: 15px;
+            overscroll-behavior: contain;
         }
         
         .screen::-webkit-scrollbar {
@@ -359,6 +360,18 @@
         const screen = document.querySelector('.screen');
         screen.scrollTop = screen.scrollHeight;
         
+        screen.addEventListener('wheel', (e) => {
+            e.preventDefault();
+        }, { passive: false });
+
+        screen.addEventListener('touchmove', (e) => {
+            e.preventDefault();
+        }, { passive: false });
+
+        screen.addEventListener('mousedown', (e) => {
+            if (e.button === 1) e.preventDefault();
+        });
+
         function typeText(elementId, text, isError = false, speed = 50) {
             return new Promise((resolve) => {
                 const element = document.getElementById(elementId);
