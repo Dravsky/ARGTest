@@ -313,7 +313,7 @@
         const firstName = urlParams.get('firstName') || 'User';
         const color = urlParams.get('color') || 'green';
         const month = urlParams.get('month') || 'January';
-        const day = parseInt(urlParams.get('day'))).toString() || '1';
+        const day = urlParams.get('day') || '1';
         const animal = urlParams.get('animal') || 'dog';
         const animName = urlParams.get('animName') || 'Buddy';
         
@@ -325,7 +325,7 @@
         
         const daysUntil = calculateDaysUntilBirthday(monthNum, parseInt(day));
         
-        const errorCode = decryptLink(firstName, color, monthNum, day, animal, animName);
+        const errorCode = decryptLink(firstName, color, month, day, animal, animName);
         
         const conversation = `
             <div class="line"><span class="prompt">&gt;</span> <span class="user-input">${color}</span></div>
@@ -391,7 +391,7 @@
         
         setTimeout(async () => {
             await typeText('line1', "It's your favorite color!");
-            await new Promise(resolve => setTimeout(resolve, 1000));
+            await new Promise(resolve => setTimeout(resolve, 300));
             await typeText('line2', "Now that we're done with all the boring stuff, let's have some fun.");
             await new Promise(resolve => setTimeout(resolve, 300));
             await typeText('line3', '[loading GAME HUB]');
