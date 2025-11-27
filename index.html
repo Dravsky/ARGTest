@@ -3,8 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hello World</title>
+    <title>Terminal</title>
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap');
+        
         * {
             margin: 0;
             padding: 0;
@@ -12,55 +14,212 @@
         }
         
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: #000;
+            font-family: 'Share Tech Mono', monospace;
+            color: #0f0;
+            overflow: hidden;
             height: 100vh;
             display: flex;
-            flex-direction: column;
-            justify-content: center;
             align-items: center;
-            transition: all 0.5s ease;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            justify-content: center;
         }
         
-        h1 {
-            font-size: 4rem;
-            font-weight: 700;
-            text-align: center;
-            padding: 2rem;
+        .crt {
+            width: 90vw;
+            height: 85vh;
+            background: #000;
+            position: relative;
+            overflow: hidden;
             border-radius: 20px;
-            transition: all 0.5s ease;
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
-            background: rgba(255, 255, 255, 0.95);
-            color: #667eea;
+            box-shadow: 0 0 100px rgba(0, 255, 0, 0.3);
         }
         
-        .info {
-            margin-top: 2rem;
-            padding: 1.5rem 2rem;
-            background: rgba(255, 255, 255, 0.95);
-            border-radius: 15px;
-            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
-            text-align: center;
+        .crt::before {
+            content: " ";
+            display: block;
+            position: absolute;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            right: 0;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+            z-index: 2;
+            background-size: 100% 2px, 3px 100%;
+            pointer-events: none;
         }
         
-        .info p {
-            margin: 0.5rem 0;
-            color: #333;
+        .crt::after {
+            content: " ";
+            display: block;
+            position: absolute;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            right: 0;
+            background: rgba(18, 16, 16, 0.1);
+            opacity: 0;
+            z-index: 2;
+            pointer-events: none;
+            animation: flicker 3s infinite;
         }
         
-        .info code {
-            background: #f0f0f0;
-            padding: 0.2rem 0.5rem;
-            border-radius: 4px;
-            font-family: monospace;
+        .screen {
+            width: 100%;
+            height: 100%;
+            padding: 40px;
+            overflow-y: auto;
+            position: relative;
+            z-index: 1;
+            animation: textShadow 1.6s infinite;
+            transform: perspective(500px) rotateX(0deg);
+            filter: blur(0.3px);
+        }
+        
+        .terminal-content {
+            transform: scaleY(1.05) scaleX(0.98);
+            transform-origin: center;
+        }
+        
+        .line {
+            margin-bottom: 10px;
+            line-height: 1.6;
+        }
+        
+        .prompt {
+            color: #0f0;
+        }
+        
+        .command {
+            color: #00ff00;
+        }
+        
+        .output {
+            color: #00dd00;
+            margin-left: 20px;
+        }
+        
+        .error {
+            color: #ff4444;
+        }
+        
+        .warning {
+            color: #ffaa00;
+        }
+        
+        .hello {
+            font-size: 2em;
+            color: #00ff00;
+            text-shadow: 0 0 10px #0f0;
+            margin: 20px 0;
+            animation: glow 2s ease-in-out infinite alternate;
+        }
+        
+        .cursor {
+            display: inline-block;
+            width: 10px;
+            height: 20px;
+            background: #0f0;
+            animation: blink 1s step-end infinite;
+            margin-left: 5px;
+        }
+        
+        @keyframes blink {
+            0%, 50% { opacity: 1; }
+            51%, 100% { opacity: 0; }
+        }
+        
+        @keyframes textShadow {
+            0% { text-shadow: 0.4389924193300864px 0 1px rgba(0,30,255,0.5), -0.4389924193300864px 0 1px rgba(255,0,80,0.3), 0 0 3px; }
+            5% { text-shadow: 2.7928974010788217px 0 1px rgba(0,30,255,0.5), -2.7928974010788217px 0 1px rgba(255,0,80,0.3), 0 0 3px; }
+            10% { text-shadow: 0.02956275843481219px 0 1px rgba(0,30,255,0.5), -0.02956275843481219px 0 1px rgba(255,0,80,0.3), 0 0 3px; }
+            15% { text-shadow: 0.40218538552878136px 0 1px rgba(0,30,255,0.5), -0.40218538552878136px 0 1px rgba(255,0,80,0.3), 0 0 3px; }
+            20% { text-shadow: 3.4794037899852017px 0 1px rgba(0,30,255,0.5), -3.4794037899852017px 0 1px rgba(255,0,80,0.3), 0 0 3px; }
+            25% { text-shadow: 1.6125630401149584px 0 1px rgba(0,30,255,0.5), -1.6125630401149584px 0 1px rgba(255,0,80,0.3), 0 0 3px; }
+            30% { text-shadow: 0.7015590085143956px 0 1px rgba(0,30,255,0.5), -0.7015590085143956px 0 1px rgba(255,0,80,0.3), 0 0 3px; }
+            35% { text-shadow: 3.896914047650351px 0 1px rgba(0,30,255,0.5), -3.896914047650351px 0 1px rgba(255,0,80,0.3), 0 0 3px; }
+            40% { text-shadow: 3.870905614848819px 0 1px rgba(0,30,255,0.5), -3.870905614848819px 0 1px rgba(255,0,80,0.3), 0 0 3px; }
+            45% { text-shadow: 2.231056963361899px 0 1px rgba(0,30,255,0.5), -2.231056963361899px 0 1px rgba(255,0,80,0.3), 0 0 3px; }
+            50% { text-shadow: 0.08084290417898504px 0 1px rgba(0,30,255,0.5), -0.08084290417898504px 0 1px rgba(255,0,80,0.3), 0 0 3px; }
+            55% { text-shadow: 2.3758461067427543px 0 1px rgba(0,30,255,0.5), -2.3758461067427543px 0 1px rgba(255,0,80,0.3), 0 0 3px; }
+            60% { text-shadow: 2.202193051050636px 0 1px rgba(0,30,255,0.5), -2.202193051050636px 0 1px rgba(255,0,80,0.3), 0 0 3px; }
+            65% { text-shadow: 2.8638780614874975px 0 1px rgba(0,30,255,0.5), -2.8638780614874975px 0 1px rgba(255,0,80,0.3), 0 0 3px; }
+            70% { text-shadow: 0.48874025155497314px 0 1px rgba(0,30,255,0.5), -0.48874025155497314px 0 1px rgba(255,0,80,0.3), 0 0 3px; }
+            75% { text-shadow: 1.8948491305757957px 0 1px rgba(0,30,255,0.5), -1.8948491305757957px 0 1px rgba(255,0,80,0.3), 0 0 3px; }
+            80% { text-shadow: 0.0833037308038857px 0 1px rgba(0,30,255,0.5), -0.0833037308038857px 0 1px rgba(255,0,80,0.3), 0 0 3px; }
+            85% { text-shadow: 0.09769827255241735px 0 1px rgba(0,30,255,0.5), -0.09769827255241735px 0 1px rgba(255,0,80,0.3), 0 0 3px; }
+            90% { text-shadow: 3.443339761481782px 0 1px rgba(0,30,255,0.5), -3.443339761481782px 0 1px rgba(255,0,80,0.3), 0 0 3px; }
+            95% { text-shadow: 2.1841838852799786px 0 1px rgba(0,30,255,0.5), -2.1841838852799786px 0 1px rgba(255,0,80,0.3), 0 0 3px; }
+            100% { text-shadow: 2.6208764473832513px 0 1px rgba(0,30,255,0.5), -2.6208764473832513px 0 1px rgba(255,0,80,0.3), 0 0 3px; }
+        }
+        
+        @keyframes flicker {
+            0% { opacity: 0.27861; }
+            5% { opacity: 0.34769; }
+            10% { opacity: 0.23604; }
+            15% { opacity: 0.90626; }
+            20% { opacity: 0.18128; }
+            25% { opacity: 0.83891; }
+            30% { opacity: 0.65583; }
+            35% { opacity: 0.67807; }
+            40% { opacity: 0.26559; }
+            45% { opacity: 0.84693; }
+            50% { opacity: 0.96019; }
+            55% { opacity: 0.08594; }
+            60% { opacity: 0.20313; }
+            65% { opacity: 0.71988; }
+            70% { opacity: 0.53455; }
+            75% { opacity: 0.37288; }
+            80% { opacity: 0.71428; }
+            85% { opacity: 0.70419; }
+            90% { opacity: 0.7003; }
+            95% { opacity: 0.36108; }
+            100% { opacity: 0.24387; }
+        }
+        
+        @keyframes glow {
+            from { text-shadow: 0 0 10px #0f0, 0 0 20px #0f0, 0 0 30px #0f0; }
+            to { text-shadow: 0 0 20px #0f0, 0 0 30px #0f0, 0 0 40px #0f0; }
         }
     </style>
 </head>
 <body>
-    <h1>Hello world!</h1>
-    <div class="info">
-        <p>Current color: <code id="colorDisplay">Default</code></p>
-        <p>Try adding <code>?color=blue</code> or <code>?color=#FF5733</code> to the URL</p>
+    <div class="crt">
+        <div class="screen">
+            <div class="terminal-content">
+                <div class="line"><span class="prompt">root@terminal:~$</span> <span class="command">systemctl status</span></div>
+                <div class="line output">● System operational - All services running</div>
+                <div class="line output">  Uptime: 127 days, 14:32:18</div>
+                <div class="line output">  Load average: 0.42, 0.38, 0.35</div>
+                <div class="line"><br></div>
+                
+                <div class="line"><span class="prompt">root@terminal:~$</span> <span class="command">./hello_world.sh</span></div>
+                <div class="line hello">Hello world!</div>
+                <div class="line output">Program executed successfully</div>
+                <div class="line output">Exit code: 0</div>
+                <div class="line"><br></div>
+                
+                <div class="line"><span class="prompt">root@terminal:~$</span> <span class="command">cat welcome.txt</span></div>
+                <div class="line output">┌─────────────────────────────────────┐</div>
+                <div class="line output">│  Welcome to the Terminal Interface  │</div>
+                <div class="line output">│  Color parameter: <span id="colorParam">DEFAULT</span>         │</div>
+                <div class="line output">└─────────────────────────────────────┘</div>
+                <div class="line"><br></div>
+                
+                <div class="line"><span class="prompt">root@terminal:~$</span> <span class="command">echo "Try adding ?color=cyan or ?color=#ff00ff to the URL"</span></div>
+                <div class="line output">Try adding ?color=cyan or ?color=#ff00ff to the URL</div>
+                <div class="line"><br></div>
+                
+                <div class="line"><span class="prompt">root@terminal:~$</span> <span class="command">ls -la</span></div>
+                <div class="line output">drwxr-xr-x  2 root root 4096 Nov 27 2025 .</div>
+                <div class="line output">drwxr-xr-x 18 root root 4096 Nov 27 2025 ..</div>
+                <div class="line output">-rwxr-xr-x  1 root root  128 Nov 27 2025 hello_world.sh</div>
+                <div class="line output">-rw-r--r--  1 root root  256 Nov 27 2025 welcome.txt</div>
+                <div class="line output">-rw-r--r--  1 root root 1024 Nov 27 2025 config.sys</div>
+                <div class="line"><br></div>
+                
+                <div class="line"><span class="prompt">root@terminal:~$</span> <span class="cursor"></span></div>
+            </div>
+        </div>
     </div>
 
     <script>
@@ -74,25 +233,41 @@
         }
         
         function applyColor(color) {
-            const body = document.body;
-            const heading = document.querySelector('h1');
-            const colorDisplay = document.getElementById('colorDisplay');
+            if (!color) return;
             
-            if (color) {
-                try {
-                    const canvas = document.createElement('canvas');
-                    const ctx = canvas.getContext('2d');
-                    ctx.fillStyle = color;
-                    const validColor = ctx.fillStyle;
-                    
-                    body.style.background = `linear-gradient(135deg, ${color} 0%, ${color}dd 100%)`;
-                    heading.style.color = color;
-                    colorDisplay.textContent = color;
-                } catch (e) {
-                    colorDisplay.textContent = 'Invalid color';
-                }
-            } else {
-                colorDisplay.textContent = 'Default (purple gradient)';
+            try {
+                const canvas = document.createElement('canvas');
+                const ctx = canvas.getContext('2d');
+                ctx.fillStyle = color;
+                const validColor = ctx.fillStyle;
+                
+                const rgb = hexToRgb(validColor);
+                if (!rgb) return;
+                
+                const style = document.createElement('style');
+                style.textContent = `
+                    body, .screen, .line, .prompt, .command, .output, .hello {
+                        color: ${validColor} !important;
+                    }
+                    .cursor {
+                        background: ${validColor} !important;
+                    }
+                    .crt {
+                        box-shadow: 0 0 100px rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.3) !important;
+                    }
+                    .hello {
+                        text-shadow: 0 0 10px ${validColor}, 0 0 20px ${validColor}, 0 0 30px ${validColor} !important;
+                    }
+                    @keyframes glow {
+                        from { text-shadow: 0 0 10px ${validColor}, 0 0 20px ${validColor}, 0 0 30px ${validColor}; }
+                        to { text-shadow: 0 0 20px ${validColor}, 0 0 30px ${validColor}, 0 0 40px ${validColor}; }
+                    }
+                `;
+                document.head.appendChild(style);
+                
+                document.getElementById('colorParam').textContent = color.toUpperCase();
+            } catch (e) {
+                console.error('Invalid color:', color);
             }
         }
         
