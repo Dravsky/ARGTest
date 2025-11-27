@@ -32,6 +32,7 @@
             overflow: hidden;
             border-radius: 20px;
             box-shadow: 0 0 100px rgba(0, 255, 0, 0.3);
+            transform: perspective(1000px);
         }
         
         .crt::before {
@@ -71,12 +72,23 @@
             position: relative;
             z-index: 1;
             animation: textShadow 1.6s infinite;
-            transform: perspective(500px) rotateX(0deg);
+            transform: translateZ(50px) scale(0.95);
+            transform-style: preserve-3d;
             filter: blur(0.3px);
+            border-radius: 15px;
+        }
+        
+        .screen::-webkit-scrollbar {
+            display: none;
+        }
+        
+        .screen {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
         }
         
         .terminal-content {
-            transform: scaleY(1.05) scaleX(0.98);
+            transform: scale(1.05, 1.08);
             transform-origin: center;
         }
         
@@ -89,38 +101,23 @@
             color: #0f0;
         }
         
-        .command {
+        .user-input {
             color: #00ff00;
+            font-weight: bold;
         }
         
         .output {
             color: #00dd00;
-            margin-left: 20px;
-        }
-        
-        .error {
-            color: #ff4444;
-        }
-        
-        .warning {
-            color: #ffaa00;
-        }
-        
-        .hello {
-            font-size: 2em;
-            color: #00ff00;
-            text-shadow: 0 0 10px #0f0;
-            margin: 20px 0;
-            animation: glow 2s ease-in-out infinite alternate;
         }
         
         .cursor {
             display: inline-block;
             width: 10px;
-            height: 20px;
+            height: 1.2em;
             background: #0f0;
             animation: blink 1s step-end infinite;
             margin-left: 5px;
+            vertical-align: text-bottom;
         }
         
         @keyframes blink {
@@ -185,39 +182,7 @@
 <body>
     <div class="crt">
         <div class="screen">
-            <div class="terminal-content">
-                <div class="line"><span class="prompt">root@terminal:~$</span> <span class="command">systemctl status</span></div>
-                <div class="line output">● System operational - All services running</div>
-                <div class="line output">  Uptime: 127 days, 14:32:18</div>
-                <div class="line output">  Load average: 0.42, 0.38, 0.35</div>
-                <div class="line"><br></div>
-                
-                <div class="line"><span class="prompt">root@terminal:~$</span> <span class="command">./hello_world.sh</span></div>
-                <div class="line hello">Hello world!</div>
-                <div class="line output">Program executed successfully</div>
-                <div class="line output">Exit code: 0</div>
-                <div class="line"><br></div>
-                
-                <div class="line"><span class="prompt">root@terminal:~$</span> <span class="command">cat welcome.txt</span></div>
-                <div class="line output">┌─────────────────────────────────────┐</div>
-                <div class="line output">│  Welcome to the Terminal Interface  │</div>
-                <div class="line output">│  Color parameter: <span id="colorParam">DEFAULT</span>         │</div>
-                <div class="line output">└─────────────────────────────────────┘</div>
-                <div class="line"><br></div>
-                
-                <div class="line"><span class="prompt">root@terminal:~$</span> <span class="command">echo "Try adding ?color=cyan or ?color=#ff00ff to the URL"</span></div>
-                <div class="line output">Try adding ?color=cyan or ?color=#ff00ff to the URL</div>
-                <div class="line"><br></div>
-                
-                <div class="line"><span class="prompt">root@terminal:~$</span> <span class="command">ls -la</span></div>
-                <div class="line output">drwxr-xr-x  2 root root 4096 Nov 27 2025 .</div>
-                <div class="line output">drwxr-xr-x 18 root root 4096 Nov 27 2025 ..</div>
-                <div class="line output">-rwxr-xr-x  1 root root  128 Nov 27 2025 hello_world.sh</div>
-                <div class="line output">-rw-r--r--  1 root root  256 Nov 27 2025 welcome.txt</div>
-                <div class="line output">-rw-r--r--  1 root root 1024 Nov 27 2025 config.sys</div>
-                <div class="line"><br></div>
-                
-                <div class="line"><span class="prompt">root@terminal:~$</span> <span class="cursor"></span></div>
+            <div class="terminal-content" id="conversation">
             </div>
         </div>
     </div>
@@ -232,6 +197,72 @@
             } : null;
         }
         
+        function generateRandomNoise(length) {
+            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+-=[]{}|;:,.<>?';
+            let noise = '';
+            for (let i = 0; i < length; i++) {
+                noise += chars.charAt(Math.floor(Math.random() * chars.length));
+            }
+            return noise;
+        }
+        
+        function simpleHash(str) {
+            let hash = 0;
+            for (let i = 0; i < str.length; i++) {
+                const char = str.charCodeAt(i);
+                hash = ((hash << 5) - hash) + char;
+                hash = hash & hash;
+            }
+            return hash;
+        }
+        
+        function decryptLink(firstName, color, month, day, animal, animName) {
+            // Convert all to lowercase for processing
+            const fName = (firstName || '').toLowerCase().trim();
+            const fColor = (color || '').toLowerCase().trim();
+            const fMonth = (month || '').toLowerCase().trim();
+            const fDay = (day || '').toLowerCase().trim();
+            const fAnimal = (animal || '').toLowerCase().trim();
+            const fAnimName = (animName || '').toLowerCase().trim();
+            
+            const key = fName + fColor + fMonth + fDay + fAnimal + fAnimName;
+            const hash = simpleHash(key);
+
+            if (hash === -1473642140) {
+                const encrypted = [104,116,116,112,115,58,47,47,100,111,99,115,46,103,111,111,103,108,101,46,99,111,109,47,100,111,99,117,109,101,110,116,47,100,47,49,69,68,73,85,67,53,109,66,122,69,51,75,110,116,85,49,82,57,82,99,114,98,113,84,120,90,50,57,103,74,115,67,117,111,109,97,73,117,83,48,70,119,77,47,101,100,105,116,63,117,115,112,61,115,104,97,114,105,110,103];
+                return encrypted.map(c => String.fromCharCode(c)).join('');
+            } else {
+                return generateRandomNoise(80);
+            }
+        }
+        
+        function calculateDaysUntilBirthday(month, day) {
+            const today = new Date();
+            const currentYear = today.getFullYear();
+            
+            // Month is 1-indexed in the input, but 0-indexed in Date
+            const birthday = new Date(currentYear, month - 1, day);
+            
+            // If birthday has passed this year, calculate for next year
+            if (birthday < today) {
+                birthday.setFullYear(currentYear + 1);
+            }
+            
+            const diffTime = birthday - today;
+            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+            
+            return diffDays;
+        }
+        
+        function lightenColor(rgb) {
+            const factor = 1.5;
+            return {
+                r: Math.min(255, Math.floor(rgb.r * factor + (255 - rgb.r) * 0.3)),
+                g: Math.min(255, Math.floor(rgb.g * factor + (255 - rgb.g) * 0.3)),
+                b: Math.min(255, Math.floor(rgb.b * factor + (255 - rgb.b) * 0.3))
+            };
+        }
+        
         function applyColor(color) {
             if (!color) return;
             
@@ -244,35 +275,82 @@
                 const rgb = hexToRgb(validColor);
                 if (!rgb) return;
                 
+                const lightRgb = lightenColor(rgb);
+                const lightColor = `rgb(${lightRgb.r}, ${lightRgb.g}, ${lightRgb.b})`;
+                
                 const style = document.createElement('style');
                 style.textContent = `
-                    body, .screen, .line, .prompt, .command, .output, .hello {
-                        color: ${validColor} !important;
+                    body, .screen, .line, .prompt, .user-input, .output {
+                        color: ${lightColor} !important;
+                        text-shadow: 0 0 5px ${lightColor} !important;
                     }
                     .cursor {
-                        background: ${validColor} !important;
+                        background: ${lightColor} !important;
+                        box-shadow: 0 0 10px ${lightColor} !important;
                     }
                     .crt {
-                        box-shadow: 0 0 100px rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.3) !important;
+                        box-shadow: 0 0 100px rgba(${lightRgb.r}, ${lightRgb.g}, ${lightRgb.b}, 0.4) !important;
                     }
-                    .hello {
-                        text-shadow: 0 0 10px ${validColor}, 0 0 20px ${validColor}, 0 0 30px ${validColor} !important;
+                    .error {
+                        color: #ff4444 !important;
+                        text-shadow: 0 0 5px #ff4444 !important;
                     }
                     @keyframes glow {
-                        from { text-shadow: 0 0 10px ${validColor}, 0 0 20px ${validColor}, 0 0 30px ${validColor}; }
-                        to { text-shadow: 0 0 20px ${validColor}, 0 0 30px ${validColor}, 0 0 40px ${validColor}; }
+                        from { text-shadow: 0 0 10px ${lightColor}, 0 0 20px ${lightColor}, 0 0 30px ${lightColor}; }
+                        to { text-shadow: 0 0 20px ${lightColor}, 0 0 30px ${lightColor}, 0 0 40px ${lightColor}; }
                     }
                 `;
                 document.head.appendChild(style);
-                
-                document.getElementById('colorParam').textContent = color.toUpperCase();
             } catch (e) {
                 console.error('Invalid color:', color);
             }
         }
         
         const urlParams = new URLSearchParams(window.location.search);
-        const color = urlParams.get('color');
+        const firstName = urlParams.get('firstName') || 'User';
+        const color = urlParams.get('color') || 'green';
+        const month = urlParams.get('month') || 'January';
+        const day = urlParams.get('day') || '1';
+        const animal = urlParams.get('animal') || 'dog';
+        const animName = urlParams.get('animName') || 'Buddy';
+        
+        const monthNum = {
+            'january': 1, 'february': 2, 'march': 3, 'april': 4,
+            'may': 5, 'june': 6, 'july': 7, 'august': 8,
+            'september': 9, 'october': 10, 'november': 11, 'december': 12
+        }[month.toLowerCase()] || parseInt(month) || 1;
+        
+        const daysUntil = calculateDaysUntilBirthday(monthNum, parseInt(day));
+        
+        // Check credentials and generate error code
+        const errorCode = decryptLink(firstName, color, month, day, animal, animName);
+        
+        // Build the conversation
+        const conversation = `
+            <div class="line"><span class="prompt">&gt;</span> <span class="user-input">${color}</span></div>
+            <div class="line output">${color} is a pretty color.</div>
+            <div class="line output">I like ${color}.</div>
+            <div class="line output">What month is your birthday in?</div>
+            <div class="line"><span class="prompt">&gt;</span> <span class="user-input">${month}</span></div>
+            <div class="line output">Ok great. How about the day?</div>
+            <div class="line"><span class="prompt">&gt;</span> <span class="user-input">${day}</span></div>
+            <div class="line output">Wow, that's only ${daysUntil} days away!</div>
+            <div class="line output">Now get ready, this one's a tough one.</div>
+            <div class="line output">What is your favorite animal?</div>
+            <div class="line"><span class="prompt">&gt;</span> <span class="user-input">${animal}</span></div>
+            <div class="line output">${animal}. I like that choice.</div>
+            <div class="line output">One more question. This one's extremely important, so choose carefully.</div>
+            <div class="line output">If you had a pet ${animal}, what would you name it?</div>
+            <div class="line"><span class="prompt">&gt;</span> <span class="user-input">${animName}</span></div>
+            <div class="line output">${animName} the ${animal}. Sounds like it would make a great buddy. :)</div>
+            <div class="line output">Thanks for answering those questions. You did a great job!</div>
+            <div class="line output">As a thanks, I have a little surprise for you...</div>
+            <div class="line"><br></div>
+            <div class="line error">ERROR: Invalid login credentials</div>
+            <div class="line error">Error code: ${errorCode}</div>
+        `;
+        
+        document.getElementById('conversation').innerHTML = conversation;
         applyColor(color);
     </script>
 </body>
